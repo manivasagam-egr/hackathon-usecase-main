@@ -24,21 +24,9 @@ resource "google_container_cluster" "gke" {
 
   remove_default_node_pool = true
   initial_node_count       = 1
+
+  node_locations = ["asia-south1-a"]   # 🔥 VERY IMPORTANT (single zone)
 }
-
-resource "google_container_node_pool" "nodes" {
-  name       = "node-pool"
-  cluster    = google_container_cluster.gke.name
-  location   = var.region
-
-  node_config {
-    machine_type = "e2-micro"   # smaller VM
-    disk_size_gb = 10           # VERY IMPORTANT 🔥 reduce disk
-  }
-
-  node_count = 1   # reduce nodes
-}
-
 resource "google_artifact_registry_repository" "repo" {
   location      = var.region
   repository_id = "my-repo"
