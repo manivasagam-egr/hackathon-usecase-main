@@ -30,7 +30,8 @@ resource "google_container_cluster" "gke" {
 resource "google_container_node_pool" "nodes" {
   name       = "node-pool"
   cluster    = google_container_cluster.gke.name
-  location   = var.region
+
+  location   = "asia-south1-a"   # 🔥 FIX (use zone, NOT region)
 
   node_config {
     machine_type = "e2-micro"
@@ -43,7 +44,6 @@ resource "google_container_node_pool" "nodes" {
 
   node_count = 1
 }
-
 resource "google_artifact_registry_repository" "repo" {
   location      = var.region
   repository_id = "my-repo-1"
