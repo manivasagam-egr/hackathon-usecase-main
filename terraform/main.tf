@@ -24,9 +24,3 @@ resource "google_artifact_registry_repository" "repo" {
     prevent_destroy = false
   }
 }
-
-resource "google_artifact_registry_repository" "repo" {
-  location      = var.region
-  repository_id = "my-repo"
-  format        = "DOCKER"
-}
