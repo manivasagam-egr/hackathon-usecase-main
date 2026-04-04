@@ -44,15 +44,16 @@ resource "google_container_cluster" "gke" {
 resource "google_container_node_pool" "nodes" {
   name     = "node-pool"
   cluster  = google_container_cluster.gke.name
-  location = var.region
 
-  depends_on = [google_container_cluster.gke]   # ✅ important
+  location = "us-central1-a"   # 🔥 MUST BE ZONE
+
+  depends_on = [google_container_cluster.gke]
 
   node_config {
-    machine_type = "e2-micro"
+    machine_type = "e2-small"   # 🔥 CHANGE (more stable than micro)
     disk_size_gb = 10
 
-    preemptible = true   # ✅ avoids quota issue
+    preemptible = true          # 🔥 VERY IMPORTANT
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
