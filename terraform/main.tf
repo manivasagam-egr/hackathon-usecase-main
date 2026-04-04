@@ -27,11 +27,11 @@ resource "google_container_cluster" "gke" {
 
   node_locations = ["asia-south1-a"]   # 🔥 VERY IMPORTANT (single zone)
 }
-resource "google_container_node_pool" "nodes" {
-  name       = "node-pool"
-  cluster    = google_container_cluster.gke.name
 
-  location   = "asia-south1-a"   # 🔥 FIX (use zone, NOT region)
+resource "google_container_node_pool" "nodes" {
+  name     = "node-pool"
+  cluster  = google_container_cluster.gke.name
+  location = var.region   # ✅ FIX
 
   node_config {
     machine_type = "e2-micro"
