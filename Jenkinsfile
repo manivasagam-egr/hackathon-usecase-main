@@ -14,20 +14,33 @@ pipeline {
             }
         }
 
-        stage('Terraform Init & Apply') {
-            steps {
-                dir('terraform') {
-                    withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        sh '''
-                        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
+stage('Terraform Fix Protection') {
+    steps {
+        dir('terraform') {
+            withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                sh '''
+                export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
 
-                        terraform init
-                        terraform plan -var="project_id=$PROJECT_ID"
-                        terraform destroy -auto-approve -var="project_id=devops-demo-project-491008"
-                        '''
-                    }
-                }
+                terraform init
+                terraform apply -auto-approve -var="project_id=devops-demo-project-491008"
+                '''
             }
         }
+    }
+}
+
+stage('Terraform Destroy Old Infra') {
+    steps {
+        dir('terraform') {
+            withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                sh '''
+                export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
+
+                terraform destroy -auto-approve -var="project_id=devops-demo-project-491008"
+                '''
+            }
+        }
+    }
+}
     }
 }
