@@ -28,15 +28,16 @@ resource "google_container_cluster" "gke" {
   name     = "devops-cluster"
   location = var.region
 
+  deletion_protection = false   # ✅ ADD THIS
+
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.subnet.name
 
   remove_default_node_pool = true
   initial_node_count       = 1
 
-  node_locations = ["us-central1-a"]   # ✅ stable zone
+  node_locations = ["us-central1-a"]
 }
-
 # -----------------------------
 # Node Pool
 # -----------------------------
