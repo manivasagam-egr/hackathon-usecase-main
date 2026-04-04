@@ -23,7 +23,7 @@ pipeline {
 
                         terraform init
                         terraform plan -var="project_id=$PROJECT_ID"
-                        terraform apply -auto-approve -var="project_id=$PROJECT_ID"
+                        terraform destroy -auto-approve -var="project_id=devops-demo-project-491008"
                         '''
                     }
                 }
