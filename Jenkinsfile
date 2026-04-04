@@ -1,46 +1,55 @@
 pipeline {
     agent any
 
-    environment {
-        PROJECT_ID = 'devops-demo-project-491008'
-        REGION = 'asia-south1'
+    parameters {
+        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Terraform Action')
     }
 
     stages {
 
-        stage('Test') {
+        stage('Terraform Init') {
             steps {
-                echo 'Jenkins connected successfully'
+                dir('terraform') {
+                    withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh '''
+                        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
+                        terraform init
+                        '''
+                    }
+                }
             }
         }
 
-stage('Terraform Fix Protection') {
-    steps {
-        dir('terraform') {
-            withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                sh '''
-                export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
-
-                terraform init
-                terraform apply -auto-approve -var="project_id=devops-demo-project-491008"
-                '''
+        stage('Terraform Apply') {
+            when {
+                expression { params.ACTION == 'apply' }
+            }
+            steps {
+                dir('terraform') {
+                    withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh '''
+                        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
+                        terraform apply -auto-approve -var="project_id=devops-demo-project-491008"
+                        '''
+                    }
+                }
             }
         }
-    }
-}
 
-stage('Terraform Destroy Old Infra') {
-    steps {
-        dir('terraform') {
-            withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                sh '''
-                export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
-
-                terraform destroy -auto-approve -var="project_id=devops-demo-project-491008"
-                '''
+        stage('Terraform Destroy') {
+            when {
+                expression { params.ACTION == 'destroy' }
+            }
+            steps {
+                dir('terraform') {
+                    withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh '''
+                        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
+                        terraform destroy -auto-approve -var="project_id=devops-demo-project-491008"
+                        '''
+                    }
+                }
             }
         }
-    }
-}
     }
 }
