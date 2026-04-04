@@ -29,13 +29,17 @@ resource "google_container_cluster" "gke" {
 }
 
 resource "google_container_node_pool" "nodes" {
-  name     = "node-pool"
-  cluster  = google_container_cluster.gke.name
-  location = var.region   # ✅ FIX
+  name       = "node-pool"
+  cluster    = google_container_cluster.gke.name
+  location   = var.region
+
+  depends_on = [google_container_cluster.gke]   # ✅ ADD THIS
 
   node_config {
     machine_type = "e2-micro"
     disk_size_gb = 10
+
+    preemptible = true   # ✅ ADD THIS (IMPORTANT)
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
